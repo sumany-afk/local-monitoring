@@ -1,0 +1,23 @@
+version: '3.7'
+
+services:
+  # 1. The Jaeger UI
+  jaeger-all-in-one:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger
+    ports:
+      - "16686:16686"  # Jaeger UI
+      - "14250:14250"  # Jaeger gRPC input (for collector)
+
+  # 2. The OpenTelemetry Collector
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    container_name: otel-collector
+    command: ["--config=/etc/otel-collector-config.yml"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel-collector-config.yml
+    ports:
+      - "4317:4317"    # OTLP gRPC input
+      - "4318:4318"    # OTLP HTTP input
+    depends_on:
+      - jaeger-all-in-one

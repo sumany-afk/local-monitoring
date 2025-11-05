@@ -1,0 +1,34 @@
+# This is the configuration for the OTel Collector
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+exporters:
+  # (A) Send traces to Jaeger
+  otlp:
+    endpoint: jaeger:4317
+    tls:
+      insecure: true
+
+  # (B) Optional: Log to console for debugging
+  debug:
+    verbosity: detailed
+
+processors:
+  batch:
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp, debug]
+    # Metrics pipeline (we'll add this later)
+    # metrics:
+    #   receivers: [otlp]
+    #   processors: [batch]
+    #   exporters: [prometheus, logging]
